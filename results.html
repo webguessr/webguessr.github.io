@@ -7,52 +7,66 @@
 		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css" >
 		<link rel="stylesheet" href="styles.css">
 
-		<script defer src="app.js"></script>
+		<script src="app.js"></script>
 		<script defer src="data-sample.js"></script>
-		<script type="text/javascript">
-		 async function getTemplates() {
-			 const templates = await fetch('templates.html')
-				 .then(r => r.text())
-				 .then(html => new DOMParser().parseFromString(html, 'text/html'))
-			 return templates
-		 }
-		 let templates;
-		 (async () => {
-			 templates = await getTemplates();
-			 const round_template = templates.getElementById('round');
-			 let clones = [];
-			 for (let i = 0; i < 3; i++) {
-				 clone = round_template.content.cloneNode(true)
-				 clones.push(clone)
-				 document.body.appendChild(clone)
-			 }
-		 })();
-		</script>
+		<script src="round.js"></script>
 
 		<style>
-		 .controlcontainer {
-			 position: static;
+		.controlcontainer {
+			position: static;
 
-			 button {
-				 display: none;
-			 }
-		 }
+			button {
+				display: none;
+			}
+		}
 
-		 body {
-			 display: flex;
-			 flex-direction: column;
-			 align-items: center;
-			 gap: 1em;
-		 }
+		body {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			gap: 1em;
+		}
 
-		 iframe {
-			 width: 600px;
-			 height: 400px;
-			 flex-shrink: 0;
-		 }
+		iframe {
+			width: 600px;
+			height: 400px;
+			flex-shrink: 0;
+		}
 		</style>
 	</head>
 
 	<body>
 	</body>
+
+	<script type="text/javascript">
+	(async () => {
+		const wg = await WebGuessr.fromSaved(window.location.search);
+		window.wg = wg;
+		for (const round_num of Object.keys(wg.game.rounds)) {
+			const round = wg.game.rounds[round_num];
+			const round_ui = await Round.create();
+			round_ui.inputControls.hidden = false;
+			document.body.appendChild(round_ui.round_el);
+			round_ui.init();
+			round_ui.load(new Date(round.timestamp).getFullYear(), round.archived_url);
+			round_ui.inputControls.hidden = true;
+			round_ui.resultsControls.hidden = false;
+			round_ui.points.value = round.points;
+			round_ui.total.value = wg.game.score;
+		}
+		/*
+		let rounds = [];
+		for (let i = 0; i < 3; i++) {
+			let round = await Round.create()
+			round.inputControls.hidden = false;
+			rounds.push(round)
+			document.body.appendChild(round.round_el)
+			round.init()
+			round.load(2021, "https://evan.widloski.com")
+			round.inputControls.hidden = true
+			round.resultsControls.hidden = false
+		}
+		*/
+	})().catch(console.error);
+	</script>
 </html>

@@ -6,14 +6,16 @@
 		<!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.classless.min.css"> -->
 		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
 		<link rel="stylesheet" href="styles.css">
+
 		<style>
-			iframe {
-				width: 100%;
-				height: 100%;
+			.round {
+			width: 100%;
+			height: 100%;
 			}
-		</style>
+			</style>
 	</head>
 	<body>
+		<!--
 		<div class="iframe-container">
 			<div class="loading-overlay" id="loading-overlay">
 				<div class="spinner"></div>
@@ -42,8 +44,8 @@
 			<div id="control">
 				<div>
 					<div style="position: relative">
-					<input disabled type="range" min="1990" max="2026" step=1 class="sliderGuess" name="year" list="dataYears" />
-					<input disabled type="range" min="1990" max="2026" step=1 class="sliderCorrect" name="year" list="dataYears" />
+						<input disabled type="range" min="1990" max="2026" step=1 class="sliderGuess" name="year" list="dataYears" />
+						<input disabled type="range" min="1990" max="2026" step=1 class="sliderCorrect" name="year" list="dataYears" />
 					</div>
 					<datalist id="dataYears">
 						<option value="2000" label="2000"></option>
@@ -66,18 +68,20 @@
 				<button>Next</button>
 			</div>
 		</div>
-		<script src="app.js"></script>
-		<script src="data-sample.js"></script>
-		<script type="text/javascript">
-			const domains = [
-				"apple.com", "google.com", "yahoo.com", "example.com",
-				"illinois.edu", "bing.com", "duckduckgo.com"
-			];
-			let game_no = parseInt(window.location.hash);
-			if (isNaN(game_no))
-				game_no = Math.floor(Date.now() / 8.64e7) - 20504;  // days+1 since game epoch
-			const wg = new WebGuessr(game_no, 5, document.getElementById("wg-frame"), document.getElementById("loading-overlay"),
-				domains, document.getElementById("wg-submit"), sites, counts);
-		</script>
+		-->
 	</body>
+	<script src="app.js"></script>
+	<script src="round.js"></script>
+	<script src="data-sample.js"></script>
+	<script type="text/javascript">
+	 (async () => {
+		 let game_no = parseInt(window.location.hash.replace(/^#/, ""));
+		 if (isNaN(game_no))
+			 game_no = Math.floor(Date.now() / 8.64e7) - 20504;  // days+1 since game epoch
+		 const wg = await WebGuessr.create(game_no, 5, document.body,
+										   sites, counts);
+		 window.wg = wg;
+		 wg.start();
+	 })();
+	</script>
 </html>
