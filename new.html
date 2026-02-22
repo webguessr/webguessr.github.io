@@ -77,7 +77,7 @@
 	 (async () => {
 		 let game_no = parseInt(window.location.hash.replace(/^#/, ""));
 		 if (isNaN(game_no))
-			 game_no = Math.floor(Date.now() / 8.64e7) - 20504;  // days+1 since game epoch
+			 game_no = Math.floor(Date.now() / 8.64e7) - 20504 + 1;  // days+1 since game epoch
 		 const wg = await WebGuessr.create(game_no, 5, document.body,
 										   sites, counts);
 		 window.wg = wg;

@@ -20,12 +20,12 @@
 			}
 		}
 
-		body {
+		#container {
 			display: flex;
 			flex-direction: column;
 			align-items: center;
 			gap: 1em;
-			padding: 2em !important;
+			padding: 2em;
 		}
 
 		iframe {
@@ -37,6 +37,7 @@
 	</head>
 
 	<body>
+	<div id="container"></div>
 
 	<script type="text/javascript">
 	(async () => {
@@ -50,7 +51,7 @@
 			const round = wg.game.rounds[round_num];
 			const round_ui = await Round.create();
 			round_ui.inputControls.hidden = false;
-			document.body.appendChild(round_ui.round_el);
+			document.getElementById("container").appendChild(round_ui.round_el);
 			round_ui.init();
 			round_ui.load(new Date(round.timestamp).getFullYear(), round.archived_url);
 			round_ui.inputControls.hidden = true;
@@ -64,7 +65,7 @@
 				results_cp += markers[Math.floor(round.points/5000 * markers.length)];
 		}
 		results_cp += `\nhttps://webguessr.github.io/new.html#${wg.game.game_id}`;
-		document.body.appendChild(results_cp_tb);
+		document.getElementById("container").appendChild(results_cp_tb);
 		document.getElementById("results").value = results_cp;
 	})().catch(console.error);
 	</script>
