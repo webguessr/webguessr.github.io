@@ -4,6 +4,11 @@ body, html {
 	height: 100%;
 }
 
+#results {
+	width: 50ch;
+	height: 100px;
+}
+
 
 .controlcontainer {
 	width: 100%;
@@ -48,7 +53,7 @@ datalist {
 	flex-direction: column;
 	justify-content: space-between;
 	writing-mode: vertical-lr;
-	width: 400px;
+	width: 450px;
 }
 
 option {
@@ -63,7 +68,7 @@ input[type='range'] {
 }
 
 .sliderGuess {
-	width: 400px;
+	width: 450px;
 	margin: 0 !important; /* override pico margin */
 }
 
@@ -73,7 +78,7 @@ input[type='range'] {
 	top: 0;
 	left: 0;
 	width: 100%;
-	width: 400px;
+	width: 450px;
 	margin: 0 !important; /* override pico margin */
 	background: transparent;
 	/* hide overlay slider track */
@@ -101,7 +106,7 @@ input[type='range'] {
   border: none;
 }
 
-.loading-overlay {
+.overlay {
   position: absolute;
   inset: 0;
   display: flex;
@@ -113,7 +118,7 @@ input[type='range'] {
   transition: opacity 0.3s ease;
 }
 
-.loading-overlay.hidden {
+.overlay.hidden {
   opacity: 0;
   pointer-events: none;
 }

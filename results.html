@@ -20,6 +20,11 @@
 			}
 		}
 
+		 /* .control {
+			border: 5px solid black;
+			margin: 2em;
+			} */
+
 		body {
 			display: flex;
 			flex-direction: column;
@@ -35,13 +40,15 @@
 		</style>
 	</head>
 
-	<body>
-	</body>
-
 	<script type="text/javascript">
 	(async () => {
 		const wg = await WebGuessr.fromSaved(window.location.search);
 		window.wg = wg;
+		const results_cp_tb = document.createElement("textarea");
+		results_cp_tb.id = "results";
+		document.body.appendChild(results_cp_tb);
+		const markers = ["🟩", "🟨", "🟧", "🟥"];
+		let results_cp = `Score: ${wg.game.score}/25000 (${wg.game.score/250}%): `;
 		for (const round_num of Object.keys(wg.game.rounds)) {
 			const round = wg.game.rounds[round_num];
 			const round_ui = await Round.create();
@@ -53,20 +60,10 @@
 			round_ui.resultsControls.hidden = false;
 			round_ui.points.value = round.points;
 			round_ui.total.value = wg.game.score;
+
+			results_cp += markers[Math.floor(round.points/5000 * markers.length)];
 		}
-		/*
-		let rounds = [];
-		for (let i = 0; i < 3; i++) {
-			let round = await Round.create()
-			round.inputControls.hidden = false;
-			rounds.push(round)
-			document.body.appendChild(round.round_el)
-			round.init()
-			round.load(2021, "https://evan.widloski.com")
-			round.inputControls.hidden = true
-			round.resultsControls.hidden = false
-		}
-		*/
+		document.getElementById("results").value = results_cp;
 	})().catch(console.error);
 	</script>
 </html>
