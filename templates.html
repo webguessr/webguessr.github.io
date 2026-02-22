@@ -1,0 +1,64 @@
+<!doctype html>
+
+<template id="round">
+    <div class="round">
+        <div class="iframe-container">
+            <div class="overlay">
+                <div class="spinner"></div>
+                <p>Loading...</p>
+            </div>
+            <iframe id="wg-frame" class="full" sandbox="allow-forms allow-scripts"></iframe>
+        </div>
+        <div hidden class="input controlcontainer">
+            <div id="control">
+                <label>Select Year:</label>
+                <div>
+                    <input type="range" min="1990" max="2026" step=1 class="sliderGuess" name="year" list="dataYears" />
+                    <datalist id="dataYears">
+                        <option value="1990" label="1990"></option>
+                        <option value="1995" label="1995"></option>
+                        <option value="2000" label="2000"></option>
+                        <option value="2005" label="2005"></option>
+                        <option value="2010" label="2010"></option>
+                        <option value="2015" label="2015"></option>
+                        <option value="2020" label="2020"></option>
+                        <option value="2025" label="2025"></option>
+                    </datalist>
+                </div>
+                <input class="textGuess" type="text" inputmode="numeric"></input>
+                <button id="submit">Submit</button>
+            </div >
+        </div>
+        <div hidden class="results controlcontainer">
+            <div id="control">
+                <div>
+                    <div style="position: relative">
+                        <input disabled type="range" min="1990" max="2026" step=1 class="sliderGuess" name="year" list="dataYears" />
+                        <input disabled type="range" min="1990" max="2026" step=1 class="sliderCorrect" name="year" list="dataYears" />
+                    </div>
+                    <datalist id="dataYears">
+                        <option value="1990" label="1990"></option>
+                        <option value="1995" label="1995"></option>
+                        <option value="2000" label="2000"></option>
+                        <option value="2005" label="2005"></option>
+                        <option value="2010" label="2010"></option>
+                        <option value="2015" label="2015"></option>
+                        <option value="2020" label="2020"></option>
+                        <option value="2025" label="2025"></option>
+                    </datalist>
+                </div>
+                <input disabled class="textGuess" type="text" inputmode="numeric"></input>
+                <p>You were <span style="display:inline" id="offset">N</span> years off.</p>
+                <div>
+                    <label>Points</label>
+                    <input disabled class="points" type="text" inputmode="numeric"></input> <span>/5000</span>
+                </div>
+                <div>
+                    <label>Total</label>
+                    <input disabled class="total" type="text" inputmode="numeric"></input> <span>/25000</span>
+                </div>
+                <button id="next">Next</button>
+            </div>
+        </div>
+    </div>
+</template>
