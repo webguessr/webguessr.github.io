@@ -33,6 +33,9 @@
 			height: 400px;
 			flex-shrink: 0;
 		}
+		 .iframe-container {
+			 width: 80%;
+		 }
 		</style>
 	</head>
 
@@ -45,7 +48,7 @@
 		window.wg = wg;
 		const results_cp_tb = document.createElement("textarea");
 		results_cp_tb.id = "results";
-		const markers = ["🟩", "🟨", "🟧", "🟥"];
+		const markers = ["🟥", "🟧", "🟨", "🟩"];
 		let results_cp = `WebGuessr Game #${wg.game.game_id}\nScore: ${wg.game.score}/25000 (${wg.game.score/250}%): `;
 		for (const round_num of Object.keys(wg.game.rounds)) {
 			const round = wg.game.rounds[round_num];
