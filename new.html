@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.classless.min.css" > -->
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css" >
+		<link rel="stylesheet" href="styles.css">
+		<script defer src="prototype.js"></script>
+	</head>
+	<body>
+		<iframe id="wg-frame"></iframe>
+		<div class="game controlcontainer">
+			<div id="control">
+				<label>Select Year:</label>
+				<div>
+					<input type="range" min="1990" max="2026" step=1 class="sliderGuess" name="year" list="dataYears" />
+					<datalist id="dataYears">
+						<option value="2000" label="2000"></option>
+						<option value="2005" label="2005"></option>
+						<option value="2010" label="2010"></option>
+						<option value="2015" label="2015"></option>
+						<option value="2020" label="2020"></option>
+					</datalist>
+				</div>
+				<input id="selectedYear" type="text" inputmode="numeric"></input>
+				<button id="wg-submit">Submit</button>
+			</div>
+		</div>
+		<div class="results controlcontainer">
+			<div id="control">
+				<div>
+					<div style="position: relative">
+					<input disabled type="range" min="1990" max="2026" step=1 class="sliderGuess" name="year" list="dataYears" />
+					<input disabled type="range" min="1990" max="2026" step=1 class="sliderCorrect" name="year" list="dataYears" />
+					</div>
+					<datalist id="dataYears">
+						<option value="2000" label="2000"></option>
+						<option value="2005" label="2005"></option>
+						<option value="2010" label="2010"></option>
+						<option value="2015" label="2015"></option>
+						<option value="2020" label="2020"></option>
+					</datalist>
+				</div>
+				<input disabled class="selectedYear" type="text" inputmode="numeric"></input>
+				You were N years off.
+				<div>
+					<label>Points</label>
+					<input disabled class="points" type="text" inputmode="numeric"></input> <span>/5000</span>
+				</div>
+				<div>
+					<label>Total</label>
+					<input disabled class="total" type="text" inputmode="numeric"></input> <span>/5000</span>
+				</div>
+				<button>Next</button>
+			</div>
+		</div>
+		<script src="app.js"></script>
+		<script src="data-sample.js"></script>
+		<script type="text/javascript">
+			const domains = [
+				"apple.com", "google.com", "yahoo.com", "example.com",
+				"illinois.edu", "bing.com", "duckduckgo.com"
+			];
+			let game_no = parseInt(window.location.hash);
+			if (isNaN(game_no))
+				game_no = Math.floor(Date.now() / 8.64e7) - 20504;  // days+1 since game epoch
+			const wg = new WebGuessr(game_no, 5, document.getElementById("wg-frame"), domains,
+				document.getElementById("wg-submit"), sites, counts);
+		</script>
+	</body>
+</html>
