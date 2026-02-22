@@ -2,15 +2,26 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8">
-		<title></title>
-		<!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.classless.min.css" > -->
-		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css" >
+		<title>WebGuessr</title>
+		<!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.classless.min.css"> -->
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
 		<link rel="stylesheet" href="styles.css">
-		<script defer src="prototype.js"></script>
+		<style>
+			iframe {
+				width: 100%;
+				height: 100%;
+			}
+		</style>
 	</head>
 	<body>
-		<iframe id="wg-frame"></iframe>
-		<div class="game controlcontainer">
+		<div class="iframe-container">
+			<div class="loading-overlay" id="loading-overlay">
+				<div class="spinner"></div>
+				<p>Loading...</p>
+			</div>
+			<iframe id="wg-frame" class="full" sandbox="allow-forms allow-scripts"></iframe>
+		</div>
+		<div class="game controlcontainer" id="game-controls">
 			<div id="control">
 				<label>Select Year:</label>
 				<div>
@@ -27,7 +38,7 @@
 				<button id="wg-submit">Submit</button>
 			</div>
 		</div>
-		<div class="results controlcontainer">
+		<div class="results controlcontainer" id="results-controls">
 			<div id="control">
 				<div>
 					<div style="position: relative">
@@ -65,8 +76,8 @@
 			let game_no = parseInt(window.location.hash);
 			if (isNaN(game_no))
 				game_no = Math.floor(Date.now() / 8.64e7) - 20504;  // days+1 since game epoch
-			const wg = new WebGuessr(game_no, 5, document.getElementById("wg-frame"), domains,
-				document.getElementById("wg-submit"), sites, counts);
+			const wg = new WebGuessr(game_no, 5, document.getElementById("wg-frame"), document.getElementById("loading-overlay"),
+				domains, document.getElementById("wg-submit"), sites, counts);
 		</script>
 	</body>
 </html>

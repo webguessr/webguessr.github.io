@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.classless.min.css" > -->
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css" >
+		<link rel="stylesheet" href="styles.css">
+
+		<script defer src="app.js"></script>
+		<script defer src="data-sample.js"></script>
+		<script type="text/javascript">
+		 async function getTemplates() {
+			 const templates = await fetch('templates.html')
+				 .then(r => r.text())
+				 .then(html => new DOMParser().parseFromString(html, 'text/html'))
+			 return templates
+		 }
+		 let templates;
+		 (async () => {
+			 templates = await getTemplates();
+			 const round_template = templates.getElementById('round');
+			 let clones = [];
+			 for (let i = 0; i < 3; i++) {
+				 clone = round_template.content.cloneNode(true)
+				 clones.push(clone)
+				 document.body.appendChild(clone)
+			 }
+		 })();
+		</script>
+
+		<style>
+		 .controlcontainer {
+			 position: static;
+
+			 button {
+				 display: none;
+			 }
+		 }
+
+		 body {
+			 display: flex;
+			 flex-direction: column;
+			 align-items: center;
+			 gap: 1em;
+		 }
+
+		 iframe {
+			 width: 600px;
+			 height: 400px;
+			 flex-shrink: 0;
+		 }
+		</style>
+	</head>
+
+	<body>
+	</body>
+</html>

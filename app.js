@@ -10,10 +10,11 @@ class BadRNG {
 }
 
 class WebGuessr {
-	constructor(game_id, num_rounds, frame, domains, submit_button, sites_list, counts_list) {
+	constructor(game_id, num_rounds, frame, frame_overlay, domains, submit_button, sites_list, counts_list) {
 		this.rng = new BadRNG(game_id);  // random number generator
 		this.num_rounds = num_rounds;  // number of game rounds
 		this.frame = frame;  // iframe element
+		this.frame_overlay = frame_overlay;  // iframe static indicator overlay element
 		this.domains = domains;  // list of domains
 		this.rounds = {};  // data for each game round
 		this.submit_button = submit_button;  // submit button
@@ -25,10 +26,18 @@ class WebGuessr {
 		if (this.num_rounds < 1)
 			throw new Error("`num_rounds` must be ≥ 1.");
 
+		this.frame.addEventListener("load", (() => {
+			this.frame_overlay.classList.add("hidden")
+		}).bind(this));
 		this.submit_button.addEventListener("click", this.submitRound.bind(this));
 
+		this.score = 0;
 		this.cur_round = 1;
 		this.runRound();
+	}
+
+	static dateFmtWaybackMachine(date) {
+		return `${date.getFullYear()}${date.getMonth()}${date.getDate()}`;
 	}
 
 	#loadFrame(url) {
@@ -58,14 +67,21 @@ class WebGuessr {
 		return keys[Math.floor(this.rng.random() * keys.length)];
 	}
 
+	#randomElement(arr) {
+		return arr[Math.floor(this.rng.random() * arr.length)];
+	}
+
 	runRound() {
-		console.debug("runRound()");
 		const r = this.rounds[this.cur_round] = {};
 		const year = this.#randomKey(this.counts_list);
-		let site = this.sites_list[Math.floor(this.rng.random() * this.sites_list.length)];
-		this.#loadFrame(`https://web.archive.org/web/${year}0702/${site}`);
+		let site = this.sites_list[this.#randomElement(this.counts_list[year])];
+		console.debug("runRound():", year, site);
+		const request_date = new Date(year, 7-1, 2);  // middle of year
+		r.timestamp = request_date;
+		r.url = site;
+		this.#loadFrame(`https://web.archive.org/web/${WebGuessr.dateFmtWaybackMachine(request_date)}/${site}`);
 		/*
-		this.#getClosestArchivedURL(domain, `${request_year}0702`)
+		this.#getClosestArchivedURL(domain, `${request_year}0702`)  // middle of year
 			.then(rsp => {
 				if (!("closest" in rsp.archived_snapshots))
 					throw new Error("No closest archived snapshot result.");
@@ -82,16 +98,14 @@ class WebGuessr {
 	submitRound() {
 		const guessed_date = new Date(document.getElementById("selectedYear").value + "-01-01");
 		const points = this.#calcScore(this.rounds[this.cur_round].timestamp, guessed_date);
-		console.log(`Awarded ${points} points.`);
-		this.cur_round++;
-		this.runRound();
-		if (this.cur_round < this.num_rounds) {
-		} else {
-			this.#submitGame();
-		}
-	}
+		this.score += points;
+		console.log(`Awarded ${points} points. Score is now ${this.score}.`);
 
-	#submitGame() {
-		// TODO: window.location = ???;
+		if (this.cur_round >= this.num_rounds) {
+			/* TODO: go to results page */
+		} else {
+			this.cur_round++;
+			this.runRound();
+		}
 	}
 }
