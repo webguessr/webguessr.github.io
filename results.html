@@ -30,6 +30,7 @@
 			flex-direction: column;
 			align-items: center;
 			gap: 1em;
+			padding: 2em;
 		}
 
 		iframe {
@@ -46,9 +47,8 @@
 		window.wg = wg;
 		const results_cp_tb = document.createElement("textarea");
 		results_cp_tb.id = "results";
-		document.body.appendChild(results_cp_tb);
 		const markers = ["🟩", "🟨", "🟧", "🟥"];
-		let results_cp = `Score: ${wg.game.score}/25000 (${wg.game.score/250}%): `;
+		let results_cp = `WebGuessr Game #${wg.game.game_id}\nScore: ${wg.game.score}/25000 (${wg.game.score/250}%): `;
 		for (const round_num of Object.keys(wg.game.rounds)) {
 			const round = wg.game.rounds[round_num];
 			const round_ui = await Round.create();
@@ -63,6 +63,8 @@
 
 			results_cp += markers[Math.floor(round.points/5000 * markers.length)];
 		}
+		results_cp += `\nhttps://webguessr.github.io/new.html#${wg.game.game_id}`;
+		document.body.appendChild(results_cp_tb);
 		document.getElementById("results").value = results_cp;
 	})().catch(console.error);
 	</script>
