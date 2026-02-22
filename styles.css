@@ -7,6 +7,9 @@ body, html {
 #results {
 	width: 50ch;
 	height: 100px;
+	flex-shrink: 0;
+	field-sizing: content;
+	margin-bottom: 2em;
 }
 
 
@@ -42,9 +45,11 @@ body, html {
 	gap: 1.5em;
 	padding: 1em;
 	font-size: 16pt;
-	border: 1px solid black;
+	border: 5px solid black;
 	border-radius: 10px;
 	background-color: white;
+	box-shadow: black 0 0 50px;
+	z-index: 999;
 }
 
 

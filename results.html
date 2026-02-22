@@ -20,17 +20,12 @@
 			}
 		}
 
-		 /* .control {
-			border: 5px solid black;
-			margin: 2em;
-			} */
-
 		body {
 			display: flex;
 			flex-direction: column;
 			align-items: center;
 			gap: 1em;
-			padding: 2em;
+			padding: 2em !important;
 		}
 
 		iframe {
@@ -40,6 +35,8 @@
 		}
 		</style>
 	</head>
+
+	<body>
 
 	<script type="text/javascript">
 	(async () => {
@@ -61,11 +58,16 @@
 			round_ui.points.value = round.points;
 			round_ui.total.value = wg.game.score;
 
-			results_cp += markers[Math.floor(round.points/5000 * markers.length)];
+			if (round.points == 5000)
+				results_cp += "🟦";
+			else
+				results_cp += markers[Math.floor(round.points/5000 * markers.length)];
 		}
 		results_cp += `\nhttps://webguessr.github.io/new.html#${wg.game.game_id}`;
 		document.body.appendChild(results_cp_tb);
 		document.getElementById("results").value = results_cp;
 	})().catch(console.error);
 	</script>
+
+	</body>
 </html>

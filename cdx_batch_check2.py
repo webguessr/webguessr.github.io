@@ -113,6 +113,9 @@ def save_outputs(all_domains: list[str], accumulated: dict[str, dict]) -> None:
 
     # CSV
     fieldnames = ["domain"] + [str(y) for y in YEARS] + ["error"]
+    print('len', len(ordered))
+    print('  ', ordered[0])
+    print('  ', ordered[-1])
     with open(OUTPUT_FILE, "w", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=fieldnames)
         writer.writeheader()
@@ -155,6 +158,9 @@ def main() -> None:
 
     stop = args.stop if args.stop is not None else len(all_domains)
     fetch_domains = all_domains[args.start:stop]
+    print('num domains:', len(all_domains))
+    print('start domain:', args.start)
+    print('stop domain:', stop)
 
     accumulated = load_csv()
     if accumulated:

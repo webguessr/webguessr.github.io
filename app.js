@@ -150,7 +150,7 @@ class WebGuessr {
 
 	next() {
 		if (this.game.cur_round >= this.game.num_rounds) {
-			window.location = "/foo/results.html" + WebGuessr.gameStateQuerySerialize(this.game);
+			window.location = "/results.html" + WebGuessr.gameStateQuerySerialize(this.game);
 		} else {
 			this.game.cur_round++;
 			this.runRound();
