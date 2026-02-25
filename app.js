@@ -17,6 +17,7 @@ class WebGuessr {
 			num_rounds: null,  // number of game rounds
 			rounds: {},  // data for each game round
 			score: null,
+			max_points_per_round: 5000,
 			cur_round: null,
 		};
 		Object.assign(this.game, game_data_overrides);
@@ -25,6 +26,8 @@ class WebGuessr {
 	static async create(game_id, num_rounds, root_el, sites_list, counts_list) {
 		if (num_rounds < 1)
 			throw new Error("`num_rounds` must be ≥ 1.");
+
+		console.log("Game:", game_id)
 
 		const wg = new WebGuessr({
 			game_id,
@@ -53,21 +56,23 @@ class WebGuessr {
 		wg.ui = {
 			rounds: {}
 		};
-		for (const round_num in Object.keys(wg.game.rounds)) {
+		/*
+		for (const round_num of Object.keys(wg.game.rounds)) {
 			const round_ui = await Round.create();
 			wg.ui.rounds[round_num] = round_ui;
 		}
+		*/
 		return wg;
 	}
 
-	static #calcRoundScore(correct_date, guessed_date) {
+	#calcRoundScore(correct_date, guessed_date) {
 		/* TODO: Make this more forgiving/accurate (sub-year resolution) once we
 		 * have feedback for the actual fetched archive date. */
 		const correct_year = correct_date.getFullYear();
 		const guessed_year = guessed_date.getFullYear();
 		console.debug(`calcRoundScore(): correct=${correct_year} guessed=${guessed_year}`);
 		const distance_years = Math.abs(correct_year - guessed_year);
-		return Math.floor(5000 * Math.E**(-Math.log(2) * distance_years / 2));
+		return Math.floor(this.game.max_points_per_round * Math.E**(-Math.log(2) * distance_years / 2));
 	}
 
 	static dateFmtWaybackMachine(date) {
@@ -161,7 +166,8 @@ class WebGuessr {
 		const round = this.game.rounds[this.game.cur_round];
 		const correct_date = round.timestamp;
 		const guessed_date = new Date(parseInt(this.ui.round.sliderGuess.value), 0, 1);
-		round.points = WebGuessr.#calcRoundScore(correct_date, guessed_date);
+		round.timestamp_guess = guessed_date;
+		round.points = this.#calcRoundScore(correct_date, guessed_date);
 		this.game.score += round.points;
 		console.log(`Round ${this.game.cur_round}: Awarded ${round.points} points. Game score is now ${this.game.score}.`);
 

@@ -10,6 +10,7 @@ class Round {
         this.resultsSliderGuess = round_el.querySelector('.results .sliderGuess');
         this.resultsSliderCorrect = round_el.querySelector('.results .sliderCorrect');
         this.resultsTextGuess = round_el.querySelector('.results .textGuess');
+        this.resultsTextCorrect = round_el.querySelector('.results .textCorrect');
 
         // iframe and overlay
         this.iframe = round_el.querySelector('iframe')

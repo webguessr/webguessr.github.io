@@ -49,23 +49,31 @@
 		const results_cp_tb = document.createElement("textarea");
 		results_cp_tb.id = "results";
 		const markers = ["🟥", "🟧", "🟨", "🟩"];
-		let results_cp = `WebGuessr Game #${wg.game.game_id}\nScore: ${wg.game.score}/25000 (${wg.game.score/250}%): `;
+		const max_game_score = wg.game.max_points_per_round * Object.keys(wg.game.rounds).length;
+		let results_cp = `WebGuessr Game #${wg.game.game_id}\nScore: ${wg.game.score}/${max_game_score} (${wg.game.score/max_game_score*100}%): `;
 		for (const round_num of Object.keys(wg.game.rounds)) {
 			const round = wg.game.rounds[round_num];
+			const correct_year = new Date(round.timestamp).getFullYear();
+			const guessed_year = new Date(round.timestamp_guess).getFullYear();
+
 			const round_ui = await Round.create();
 			round_ui.inputControls.hidden = false;
 			document.getElementById("container").appendChild(round_ui.round_el);
 			round_ui.init();
-			round_ui.load(new Date(round.timestamp).getFullYear(), round.archived_url);
 			round_ui.inputControls.hidden = true;
 			round_ui.resultsControls.hidden = false;
+			round_ui.resultsTextCorrect.value = correct_year;
+			round_ui.resultsSliderGuess.value = round_ui.sliderGuess.value = guessed_year;
+			round_ui.resultsTextGuess.value = guessed_year;
 			round_ui.points.value = round.points;
 			round_ui.total.value = wg.game.score;
+			round_ui.load(correct_year, round.archived_url);
+			wg.ui.rounds[round_num] = round_ui;
 
-			if (round.points == 5000)
+			if (round.points == wg.game.max_points_per_round)
 				results_cp += "🟦";
 			else
-				results_cp += markers[Math.floor(round.points/5000 * markers.length)];
+				results_cp += markers[Math.floor(round.points/wg.game.max_points_per_round * markers.length)];
 		}
 		results_cp += `\nhttps://webguessr.github.io/new.html#${wg.game.game_id}`;
 		document.getElementById("container").appendChild(results_cp_tb);
