@@ -6,82 +6,27 @@
 		<!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.classless.min.css"> -->
 		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
 		<link rel="stylesheet" href="styles.css">
-
 		<style>
 			.round {
-			width: 100%;
-			height: 100%;
+				width: 100%;
+				height: 100%;
 			}
-			</style>
+		</style>
 	</head>
 	<body>
-		<!--
-		<div class="iframe-container">
-			<div class="loading-overlay" id="loading-overlay">
-				<div class="spinner"></div>
-				<p>Loading...</p>
-			</div>
-			<iframe id="wg-frame" class="full" sandbox="allow-forms allow-scripts"></iframe>
-		</div>
-		<div class="game controlcontainer" id="game-controls">
-			<div id="control">
-				<label>Select Year:</label>
-				<div>
-					<input type="range" min="1990" max="2026" step=1 class="sliderGuess" name="year" list="dataYears" />
-					<datalist id="dataYears">
-						<option value="2000" label="2000"></option>
-						<option value="2005" label="2005"></option>
-						<option value="2010" label="2010"></option>
-						<option value="2015" label="2015"></option>
-						<option value="2020" label="2020"></option>
-					</datalist>
-				</div>
-				<input id="selectedYear" type="text" inputmode="numeric"></input>
-				<button id="wg-submit">Submit</button>
-			</div>
-		</div>
-		<div class="results controlcontainer" id="results-controls">
-			<div id="control">
-				<div>
-					<div style="position: relative">
-						<input disabled type="range" min="1990" max="2026" step=1 class="sliderGuess" name="year" list="dataYears" />
-						<input disabled type="range" min="1990" max="2026" step=1 class="sliderCorrect" name="year" list="dataYears" />
-					</div>
-					<datalist id="dataYears">
-						<option value="2000" label="2000"></option>
-						<option value="2005" label="2005"></option>
-						<option value="2010" label="2010"></option>
-						<option value="2015" label="2015"></option>
-						<option value="2020" label="2020"></option>
-					</datalist>
-				</div>
-				<input disabled class="selectedYear" type="text" inputmode="numeric"></input>
-				You were N years off.
-				<div>
-					<label>Points</label>
-					<input disabled class="points" type="text" inputmode="numeric"></input> <span>/5000</span>
-				</div>
-				<div>
-					<label>Total</label>
-					<input disabled class="total" type="text" inputmode="numeric"></input> <span>/5000</span>
-				</div>
-				<button>Next</button>
-			</div>
-		</div>
-		-->
 	</body>
 	<script src="app.js"></script>
 	<script src="round.js"></script>
 	<script src="data-sample.js"></script>
 	<script type="text/javascript">
-	 (async () => {
-		 let game_no = parseInt(window.location.hash.replace(/^#/, ""));
-		 if (isNaN(game_no))
-			 game_no = Math.floor(Date.now() / 8.64e7) - 20504 + 1;  // days+1 since game epoch
-		 const wg = await WebGuessr.create(game_no, 5, document.body,
-										   sites, counts);
-		 window.wg = wg;
-		 wg.start();
-	 })();
+		(async () => {
+			let game_no = parseInt(window.location.hash.replace(/^#/, ""));
+			if (isNaN(game_no))
+				game_no = Math.floor(Date.now() / 8.64e7) - 20504 + 1;  // days+1 since game epoch
+			const wg = await WebGuessr.create(game_no, 5, document.body,
+				sites, counts);
+			window.wg = wg;
+			wg.start();
+		})();
 	</script>
 </html>
