@@ -46,6 +46,7 @@ class Round {
 
         this.submit.onclick = () => {
             this.offset.textContent = Math.abs(this.sliderGuess.value - this.resultsSliderCorrect.value)
+            this.resultsTextGuess.value = this.textGuess.value
         }
 
         // hide overlay on load
@@ -73,6 +74,7 @@ class Round {
         this.overlay.hidden = false
         this.iframe.src = url;
         this.resultsSliderCorrect.value = correctYear;
+        this.resultsTextCorrect.value = correctYear;
         // fixme duplicate of onclick below - clean up logic
         this.offset.textContent = Math.abs(this.sliderGuess.value - this.resultsSliderCorrect.value)
     }
