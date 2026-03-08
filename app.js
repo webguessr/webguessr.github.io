@@ -72,7 +72,7 @@ class WebGuessr {
 		const guessed_year = guessed_date.getFullYear();
 		console.debug(`calcRoundScore(): correct=${correct_year} guessed=${guessed_year}`);
 		const distance_years = Math.abs(correct_year - guessed_year);
-		return Math.floor(this.game.max_points_per_round * Math.E**(-Math.log(2) * distance_years / 2));
+		return Math.floor(this.game.max_points_per_round * Math.E**(-Math.log(2) * distance_years / 7));
 	}
 
 	static dateFmtWaybackMachine(date) {
