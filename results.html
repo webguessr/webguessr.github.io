@@ -76,7 +76,7 @@
 			else
 				results_cp += markers[Math.floor(round.points/wg.game.max_points_per_round * markers.length)];
 		}
-		results_cp += `\nhttps://webguessr.github.io/new.html#${wg.game.game_id}`;
+		results_cp += `\nhttps://webguessr.github.io/`;
 		document.getElementById("container").appendChild(results_cp_tb);
 		document.getElementById("results").value = results_cp;
 	})().catch(console.error);
