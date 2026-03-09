@@ -35,7 +35,8 @@
 			flex-shrink: 0;
 		}
 		 .iframe-container {
-			 width: 80%;
+			 width: 60%;
+			 height: 70vh;
 		 }
 		</style>
 	</head>
@@ -45,41 +46,41 @@
 
 	<script type="text/javascript">
 	(async () => {
-		const wg = await WebGuessr.fromSaved(window.location.search);
-		window.wg = wg;
-		const results_cp_tb = document.createElement("textarea");
-		results_cp_tb.id = "results";
-		const markers = ["🟥", "🟧", "🟨", "🟩"];
-		const max_game_score = wg.game.max_points_per_round * Object.keys(wg.game.rounds).length;
-		let results_cp = `WebGuessr Game #${wg.game.game_id}\nScore: ${wg.game.score}/${max_game_score} (${wg.game.score/max_game_score*100}%): `;
-		for (const round_num of Object.keys(wg.game.rounds)) {
-			const round = wg.game.rounds[round_num];
-			const correct_year = new Date(round.timestamp).getFullYear();
-			const guessed_year = new Date(round.timestamp_guess).getFullYear();
+		 const wg = await WebGuessr.fromSaved(window.location.search);
+		 window.wg = wg;
+		 const results = document.createElement("pre");
+		 document.getElementById("container").appendChild(results);
+		 results.id = "results";
+		 const markers = ["🟥", "🟧", "🟨", "🟩"];
+		 const max_game_score = wg.game.max_points_per_round * Object.keys(wg.game.rounds).length;
+		 let results_text = `WebGuessr Game #${wg.game.game_id}\nScore: ${wg.game.score}/${max_game_score} (${wg.game.score/max_game_score*100}%): `;
+		 for (const round_num of Object.keys(wg.game.rounds)) {
+			 const round = wg.game.rounds[round_num];
+			 const correct_year = new Date(round.timestamp).getFullYear();
+			 const guessed_year = new Date(round.timestamp_guess).getFullYear();
 
-			const round_ui = await Round.create();
-			round_ui.inputControls.hidden = false;
-			document.getElementById("container").appendChild(round_ui.round_el);
-			round_ui.init();
-			round_ui.inputControls.hidden = true;
-			round_ui.resultsControls.hidden = false;
-			round_ui.resultsTextCorrect.value = correct_year;
-			round_ui.resultsSliderGuess.value = round_ui.sliderGuess.value = guessed_year;
-			round_ui.resultsTextGuess.value = guessed_year;
-			round_ui.points.value = round.points;
-			round_ui.total.value = wg.game.score;
-			round_ui.load(correct_year, round.archived_url);
-			wg.ui.rounds[round_num] = round_ui;
+			 const round_ui = await Round.create();
+			 round_ui.inputControls.hidden = false;
+			 document.getElementById("container").appendChild(round_ui.round_el);
+			 round_ui.init();
+			 round_ui.inputControls.hidden = true;
+			 round_ui.resultsControls.hidden = false;
+			 round_ui.resultsTextCorrect.value = correct_year;
+			 round_ui.resultsSliderGuess.value = round_ui.sliderGuess.value = guessed_year;
+			 round_ui.resultsTextGuess.value = guessed_year;
+			 round_ui.points.value = round.points;
+			 round_ui.total.value = wg.game.score;
+			 round_ui.load(correct_year, round.archived_url);
+			 wg.ui.rounds[round_num] = round_ui;
 
-			if (round.points == wg.game.max_points_per_round)
-				results_cp += "🟦";
-			else
-				results_cp += markers[Math.floor(round.points/wg.game.max_points_per_round * markers.length)];
-		}
-		results_cp += `\nhttps://webguessr.github.io/`;
-		document.getElementById("container").appendChild(results_cp_tb);
-		document.getElementById("results").value = results_cp;
-	})().catch(console.error);
+			 if (round.points == wg.game.max_points_per_round)
+				 results_text += "🟦";
+			 else
+				 results_text += markers[Math.floor(round.points/wg.game.max_points_per_round * markers.length)];
+		 }
+		 results_text += `\nhttps://webguessr.github.io/`;
+		 results.innerHTML = results_text;
+	 })().catch(console.error);
 	</script>
 
 	</body>

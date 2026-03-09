@@ -6,10 +6,11 @@ body, html {
 
 #results {
 	width: 50ch;
-	height: 100px;
+	/* height: 100px; */
 	flex-shrink: 0;
 	field-sizing: content;
 	margin-bottom: 2em;
+  padding: 1em;
 }
 
 .round {
