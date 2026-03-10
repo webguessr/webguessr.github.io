@@ -68,11 +68,20 @@ class Round {
         return templates
     }
 
-    load(correctYear, url) {
+    async load(correctYear, url) {
         //document.getElementById("control").textContent = url;
         console.debug(`Loading frame ${url}`);
         this.overlay.hidden = false;
-        this.iframe.src = url;
+        
+        const redactedHtml = await fetchAndRedact(url);
+        if (redactedHtml) {
+            this.iframe.removeAttribute('src');
+            this.iframe.srcdoc = redactedHtml;
+        } else {
+            // Fallback to direct src if redaction fails
+            this.iframe.src = url;
+        }
+        
         this.resultsSliderCorrect.value = correctYear;
         this.resultsTextCorrect.value = correctYear;
         // fixme duplicate of onclick below - clean up logic

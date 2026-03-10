@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebGuessr - Redaction Manual Tester</title>
+    <link rel="icon" href="data:,">
+    <style>
+        body { font-family: sans-serif; padding: 20px; display: flex; flex-direction: column; height: 100vh; margin: 0; box-sizing: border-box; }
+        .controls { padding: 10px; background: #f0f0f0; border-bottom: 1px solid #ccc; margin-bottom: 10px; }
+        input[type="text"] { width: 60%; padding: 8px; }
+        button { padding: 8px 16px; cursor: pointer; background: #007bff; color: white; border: none; border-radius: 4px; }
+        button:hover { background: #0056b3; }
+        .viewer { flex: 1; display: flex; flex-direction: column; }
+        iframe { flex: 1; border: 1px solid #999; width: 100%; }
+        label { font-weight: bold; margin-bottom: 5px; }
+        #status { margin-left: 10px; color: #666; font-style: italic; }
+    </style>
+</head>
+<body>
+    <div class="controls">
+        <label for="url-input">Wayback URL:</label>
+        <input type="text" id="url-input" placeholder="https://web.archive.org/web/20011215090847/http://dzen.ru/" value="https://web.archive.org/web/20011215090847/http://dzen.ru/">
+        <button onclick="testUrl()">Load Redacted</button>
+        <span id="status">Ready</span>
+    </div>
+
+    <div class="viewer">
+        <label>Game Flow Output (srcdoc):</label>
+        <iframe id="target-iframe" sandbox="allow-forms allow-scripts"></iframe>
+    </div>
+
+    <script src="redaction.js"></script>
+    <script>
+        /**
+         * MIRRORS Round.load() logic exactly
+         */
+        async function testUrl() {
+            const url = document.getElementById('url-input').value.trim();
+            const status = document.getElementById('status');
+            const iframe = document.getElementById('target-iframe');
+
+            if (!url) return;
+
+            status.innerText = "Processing...";
+            
+            try {
+                // Same logic as round.js:
+                const redactedHtml = await fetchAndRedact(url);
+                if (redactedHtml) {
+                    iframe.removeAttribute('src');
+                    iframe.srcdoc = redactedHtml;
+                    status.innerText = "Loaded via srcdoc.";
+                } else {
+                    // Fallback to direct src if redaction fails
+                    iframe.src = url;
+                    status.innerText = "Redaction failed, fell back to direct src.";
+                }
+            } catch (e) {
+                console.error(e);
+                status.innerText = "Error: " + e.message;
+            }
+        }
+    </script>
+</body>
+</html>
