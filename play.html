@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>WebGuessr</title>
+		<link rel="icon" href="/webguessr-icon.png" type="image/png">
+		<!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.classless.min.css"> -->
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+		<link rel="stylesheet" href="styles.css">
+		<style>
+			.round {
+				width: 100%;
+				height: 100%;
+			}
+		</style>
+	</head>
+	<body>
+	</body>
+	<script src="app.js"></script>
+	<script src="round.js"></script>
+	<script src="data-sample.js"></script>
+	<script type="text/javascript">
+		(async () => {
+			let game_no = parseInt(window.location.hash.replace(/^#/, ""));
+			if (isNaN(game_no))
+				game_no = Math.floor(Date.now() / 8.64e7) - 20504 + 1;  // days+1 since game epoch
+			const wg = await WebGuessr.create(game_no, 5, document.body,
+				sites, counts);
+			window.wg = wg;
+			wg.start();
+		})();
+	</script>
+</html>

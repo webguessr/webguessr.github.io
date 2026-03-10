@@ -50,7 +50,7 @@ class Round {
         }
 
         // hide overlay on load
-        this.iframe.addEventListener("load", () => {this.overlay.hidden=true});
+        this.iframe.addEventListener("load", () => { this.overlay.hidden = true; });
     }
 
     static async create() {
@@ -71,7 +71,7 @@ class Round {
     load(correctYear, url) {
         //document.getElementById("control").textContent = url;
         console.debug(`Loading frame ${url}`);
-        this.overlay.hidden = false
+        this.overlay.hidden = false;
         this.iframe.src = url;
         this.resultsSliderCorrect.value = correctYear;
         this.resultsTextCorrect.value = correctYear;

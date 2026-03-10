@@ -3,14 +3,11 @@
 <template id="round">
     <div class="round">
         <div class="iframe-container">
-            <div class="overlay">
-                <div class="spinner"></div>
-                <p>Loading...</p>
-            </div>
+            <div class="overlay" aria-busy="true"></div>
             <iframe id="wg-frame" class="full" sandbox="allow-forms allow-scripts"></iframe>
         </div>
         <div hidden class="input controlcontainer">
-            <div id="control">
+            <article id="control">
                 <label>Select Year:</label>
                 <div>
                     <input type="range" min="1990" max="2026" step=1 class="sliderGuess" name="year" list="dataYears" />
@@ -27,10 +24,10 @@
                 </div>
                 <input class="textGuess" type="text" inputmode="numeric"></input>
                 <button id="submit">Submit</button>
-            </div >
+            </article>
         </div>
         <div hidden class="results controlcontainer">
-            <div id="control">
+            <article id="control">
                 <div>
                     <div style="position: relative">
                         <input disabled type="range" min="1990" max="2026" step=1 class="sliderGuess" name="year" list="dataYears" />
@@ -59,7 +56,7 @@
                     <input disabled class="total" type="text" inputmode="numeric"></input> <span>/25000</span>
                 </div>
                 <button id="next">Next</button>
-            </div>
+            </article>
         </div>
     </div>
 </template>
