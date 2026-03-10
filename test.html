@@ -20,21 +20,18 @@
 <body>
     <div class="controls">
         <label for="url-input">Wayback URL:</label>
-        <input type="text" id="url-input" placeholder="https://web.archive.org/web/20011215090847/http://dzen.ru/" value="https://web.archive.org/web/20011215090847/http://dzen.ru/">
+        <input type="text" id="url-input" value="https://web.archive.org/web/20011215090847/http://dzen.ru/">
         <button onclick="testUrl()">Load Redacted</button>
         <span id="status">Ready</span>
     </div>
 
     <div class="viewer">
-        <label>Game Flow Output (srcdoc):</label>
+        <label>Redacted Output (srcdoc):</label>
         <iframe id="target-iframe" sandbox="allow-forms allow-scripts"></iframe>
     </div>
 
     <script src="redaction.js"></script>
     <script>
-        /**
-         * MIRRORS Round.load() logic exactly
-         */
         async function testUrl() {
             const url = document.getElementById('url-input').value.trim();
             const status = document.getElementById('status');
@@ -45,14 +42,12 @@
             status.innerText = "Processing...";
             
             try {
-                // Same logic as round.js:
                 const redactedHtml = await fetchAndRedact(url);
                 if (redactedHtml) {
                     iframe.removeAttribute('src');
                     iframe.srcdoc = redactedHtml;
                     status.innerText = "Loaded via srcdoc.";
                 } else {
-                    // Fallback to direct src if redaction fails
                     iframe.src = url;
                     status.innerText = "Redaction failed, fell back to direct src.";
                 }

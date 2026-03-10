@@ -15,9 +15,14 @@ const TEST_CASES = [
         expected: /Copyright XXXX Mi/
     },
     {
-        name: "Root-relative URL Rewriting",
+        name: "Root-relative URL Rewriting (Double Quote)",
         input: '<img src="/logo.png">',
         expected: /src="https:\/\/web\.archive\.org\/web\/\d+\/http:\/\/example\.com\/logo\.png"/
+    },
+    {
+        name: "Root-relative URL Rewriting (Single Quote Regression)",
+        input: "<script src='/app.js'></script>",
+        expected: /src='https:\/\/web\.archive\.org\/web\/\d+\/http:\/\/example\.com\/app\.js'/
     },
     {
         name: "Relative Path (no slash) Rewriting",
@@ -83,7 +88,7 @@ async function runRedactionTests() {
         const passed = tc.expected.test(result);
         
         if (passed) passedCount++;
-        results.push({ name: tc.name, passed, result });
+        results.push({ name: tc.name, passed, result, expected: tc.expected });
 
         if (isNode) {
             console.log(`${passed ? '✅' : '❌'} ${tc.name}`);
@@ -106,7 +111,13 @@ async function runRedactionTests() {
             div.style.margin = "5px 0";
             div.style.borderLeft = "5px solid " + (res.passed ? "green" : "red");
             div.style.backgroundColor = res.passed ? "#eaffea" : "#ffeaea";
-            div.innerHTML = `<strong>${res.name}</strong>: ${res.passed ? "PASSED" : "FAILED"}`;
+            
+            let html = `<strong>${res.name}</strong>: ${res.passed ? "PASSED" : "FAILED"}`;
+            if (!res.passed) {
+                html += `<br><small>Expected: ${res.expected.toString().replace(/</g, '&lt;')}</small>`;
+                html += `<br><small>Received: ${res.result.replace(/</g, '&lt;')}</small>`;
+            }
+            div.innerHTML = html;
             container.appendChild(div);
         });
     }
@@ -114,7 +125,6 @@ async function runRedactionTests() {
 
 // Auto-run if Node.js
 if (typeof process !== 'undefined' && process.release && process.release.name === 'node') {
-    // In node, we need to load redaction.js
     const fs = require('fs');
     const path = require('path');
     const code = fs.readFileSync(path.join(__dirname, 'redaction.js'), 'utf8');

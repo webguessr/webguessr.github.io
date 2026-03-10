@@ -5,34 +5,28 @@
 async function fetchAndRedact(archivedUrl) {
     const timestampMatch = archivedUrl.match(/\/web\/(\d+)/);
     if (!timestampMatch) return null;
-    const timestamp = timestampMatch[1];
-    const archiveBase = `https://web.archive.org/web/${timestamp}`;
-    
-    const idUrl = archivedUrl.replace(/\/web\/(\d+)[a-z_]*\//, "/web/$1id_/");
+    let timestamp = timestampMatch[1];
     
     const siteUrlMatch = archivedUrl.match(/\/web\/\d+[a-z_]*\/(https?:\/\/.*|.*)/);
     if (!siteUrlMatch) return null;
     let siteUrl = siteUrlMatch[1].replace(/\/$/, ""); 
-    
-    let siteRoot = "";
-    try {
-        const urlToParse = siteUrl.startsWith('http') ? siteUrl : 'http://' + siteUrl;
-        const urlObj = new URL(urlToParse);
-        siteRoot = `${urlObj.protocol}//${urlObj.host}`;
-    } catch (e) {
-        const match = siteUrl.match(/^(https?:\/\/)?([^\/]+)/);
-        siteRoot = match ? `${match[1] || "http://"}${match[2]}` : siteUrl.split('/')[0];
-    }
-    const baseForRootRelative = `${archiveBase}/${siteRoot}`;
 
-    let siteUrlDir = "";
-    if (siteUrl.includes('/') && siteUrl.split('/').length > (siteUrl.startsWith('http') ? 3 : 1)) {
-        siteUrlDir = siteUrl.substring(0, siteUrl.lastIndexOf('/') + 1);
-    } else {
-        siteUrlDir = siteUrl + '/';
+    // 1. Resolve shorthand timestamp via API for stability
+    if (timestamp.length < 14) {
+        try {
+            const availUrl = `https://archive.org/wayback/available?url=${encodeURIComponent(siteUrl)}&timestamp=${timestamp}`;
+            const availResp = await fetch(`https://corsproxy.io/?${encodeURIComponent(availUrl)}`);
+            if (availResp.ok) {
+                const data = await availResp.json();
+                if (data.archived_snapshots?.closest?.timestamp) {
+                    timestamp = data.archived_snapshots.closest.timestamp;
+                }
+            }
+        } catch (e) { console.warn("Timestamp resolution failed", e); }
     }
-    const baseForRelative = `${archiveBase}/${siteUrlDir.startsWith('http') ? '' : 'http://'}${siteUrlDir}`;
 
+    const archiveBase = `https://web.archive.org/web/${timestamp}`;
+    const idUrl = `${archiveBase}id_/${siteUrl}`;
     const proxyUrl = "https://corsproxy.io/?";
     
     try {
@@ -42,55 +36,62 @@ async function fetchAndRedact(archivedUrl) {
         const contentType = response.headers.get("content-type") || "";
         const charsetMatch = contentType.match(/charset=([^;]+)/i);
         const encoding = charsetMatch ? charsetMatch[1].trim() : "utf-8";
-        
         const buffer = await response.arrayBuffer();
-        const decoder = new TextDecoder(encoding);
-        let html = decoder.decode(buffer);
+        const html = new TextDecoder(encoding).decode(buffer);
 
-        // 1. Redact Years (19xx or 20xx)
-        const yearRegex = /\b(19|20)\d{2}\b/g;
-        html = html.replace(yearRegex, "XXXX");
-        
-        // 2. Handle existing <base> tags
-        const baseMatch = html.match(/<base\b[^>]*href=["']([^"']*)["'][^>]*>/i);
-        if (baseMatch) {
-            const originalBase = baseMatch[1];
-            let newBase = originalBase;
-            if (!originalBase.startsWith('http') && !originalBase.startsWith('//')) {
-                newBase = new URL(originalBase, siteUrl.startsWith('http') ? siteUrl : 'http://' + siteUrl).href;
-            }
-            const waybackBase = `${archiveBase}/${newBase.replace(/^https?:\/\//, 'http://')}`;
-            html = html.replace(baseMatch[0], `<base href="${waybackBase}">`);
-        } else {
-            const finalBaseUrl = `${archiveBase}/${siteUrl.startsWith('http') ? '' : 'http://'}${siteUrl}/`;
-            const baseTag = `<base href="${finalBaseUrl}">`;
-            if (html.includes('<head>')) {
-                html = html.replace('<head>', `<head>${baseTag}`);
-            } else {
-                html = baseTag + html;
-            }
-        }
-        
-        // 3. Rewrite URLs
-        const rewrite = (url) => {
-            if (url.startsWith('http') || url.startsWith('/') || url.startsWith('.') || url.startsWith('archive.org')) {
-                return null;
-            }
-            return `${baseForRelative}${url}`;
+        // 2. Parse into DOM for surgical modification
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+
+        // 3. Robust URL Rewriting via DOM API
+        let siteRootOrigin = "";
+        try {
+            const urlObj = new URL(siteUrl.startsWith('http') ? siteUrl : 'http://' + siteUrl);
+            siteRootOrigin = urlObj.origin;
+        } catch(e) { siteRootOrigin = siteUrl.split('/')[0]; }
+
+        const resolveUrl = (url) => {
+            if (!url || url.includes('archive.org') || url.startsWith('data:') || url.startsWith('#') || url.startsWith('javascript:')) return url;
+            if (url.startsWith('//')) return `${archiveBase}/https:${url}`;
+            if (url.startsWith('http')) return `${archiveBase}/${url}`;
+            if (url.startsWith('/')) return `${archiveBase}/${siteRootOrigin}${url}`;
+            // Directory relative links are handled by <base> tag
+            return url;
         };
 
-        html = html.replace(/(src|href|action)=["'](https?:\/\/(?!(web\.)?archive\.org)[^"']*)["']/g, `$1="${archiveBase}/$2"`);
-        html = html.replace(/(src|href|action)=["']\/\/([^"']*)["']/g, `$1="${archiveBase}/https://$2"`);
-        html = html.replace(/(src|href|action)=["']\/([^/][^"']*)["']/g, `$1="${baseForRootRelative}/$2"`);
-        html = html.replace(/(src|href|action)=["']([^"']+)["']/g, (match, attr, path) => {
-            const res = rewrite(path);
-            return res ? `${attr}="${res}"` : match;
+        doc.querySelectorAll('[src], [href], [action]').forEach(el => {
+            ['src', 'href', 'action'].forEach(attr => {
+                if (el.hasAttribute(attr)) el.setAttribute(attr, resolveUrl(el.getAttribute(attr)));
+            });
         });
 
-        html = html.replace(/url\(["']?\/([^/][^"')]*)["']?\)/g, `url("${baseForRootRelative}/$1")`);
-        html = html.replace(/url\(["']?(https?:\/\/(?!(web\.)?archive\.org)[^"')]*)["']?\)/g, `url("${archiveBase}/$1")`);
-        
-        return html;
+        // 4. Neutralize Anti-Clickjack
+        const acj = doc.getElementById('antiClickjack');
+        if (acj) acj.remove();
+        doc.querySelectorAll('style').forEach(s => {
+            if (s.textContent.includes('display: none !important') && s.textContent.includes('body')) s.remove();
+        });
+
+        // 5. Surgical Redaction (Text Nodes only)
+        const yearRegex = /\b(19|20)\d{2}\b/g;
+        const walk = (node) => {
+            if (node.nodeType === 3) {
+                const parent = node.parentElement;
+                if (parent && !['SCRIPT', 'STYLE', 'HEAD', 'NOSCRIPT'].includes(parent.tagName)) {
+                    node.nodeValue = node.nodeValue.replace(yearRegex, "XXXX");
+                }
+            } else {
+                node.childNodes.forEach(walk);
+            }
+        };
+        walk(doc.body || doc.documentElement);
+
+        // 6. Inject Base Tag and Serialize
+        const base = doc.createElement('base');
+        base.href = `${archiveBase}/${siteUrl}/`;
+        doc.head.insertBefore(base, doc.head.firstChild);
+
+        return doc.documentElement.outerHTML;
     } catch (error) {
         console.error("Redaction failed:", error);
         return null;
