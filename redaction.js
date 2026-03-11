@@ -11,20 +11,7 @@ async function fetchAndRedact(archivedUrl) {
     if (!siteUrlMatch) return null;
     let siteUrl = siteUrlMatch[1].replace(/\/$/, ""); 
 
-    // 1. Resolve shorthand timestamp via API for stability
-    if (timestamp.length < 14) {
-        try {
-            const availUrl = `https://archive.org/wayback/available?url=${encodeURIComponent(siteUrl)}&timestamp=${timestamp}`;
-            const availResp = await fetch(`https://corsproxy.io/?${encodeURIComponent(availUrl)}`);
-            if (availResp.ok) {
-                const data = await availResp.json();
-                if (data.archived_snapshots?.closest?.timestamp) {
-                    timestamp = data.archived_snapshots.closest.timestamp;
-                }
-            }
-        } catch (e) { console.warn("Timestamp resolution failed", e); }
-    }
-
+    // NO API RESOLUTION - Using the timestamp exactly as provided
     const archiveBase = `https://web.archive.org/web/${timestamp}`;
     const idUrl = `${archiveBase}id_/${siteUrl}`;
     const proxyUrl = "https://corsproxy.io/?";
@@ -39,11 +26,11 @@ async function fetchAndRedact(archivedUrl) {
         const buffer = await response.arrayBuffer();
         const html = new TextDecoder(encoding).decode(buffer);
 
-        // 2. Parse into DOM for surgical modification
+        // 2. Parse into DOM
         const parser = new DOMParser();
         const doc = parser.parseFromString(html, 'text/html');
 
-        // 3. Robust URL Rewriting via DOM API
+        // 3. Simple URL Rewriting via DOM API
         let siteRootOrigin = "";
         try {
             const urlObj = new URL(siteUrl.startsWith('http') ? siteUrl : 'http://' + siteUrl);
@@ -55,7 +42,6 @@ async function fetchAndRedact(archivedUrl) {
             if (url.startsWith('//')) return `${archiveBase}/https:${url}`;
             if (url.startsWith('http')) return `${archiveBase}/${url}`;
             if (url.startsWith('/')) return `${archiveBase}/${siteRootOrigin}${url}`;
-            // Directory relative links are handled by <base> tag
             return url;
         };
 
